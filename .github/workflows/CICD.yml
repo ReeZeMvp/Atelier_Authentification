@@ -26,11 +26,19 @@ jobs:
             last_directory=$(basename ${{ runner.workspace }})
             cd $HOME/
             git clone https://github.com/${{ github.repository }}.git
+            # Debug : voir le contenu avant sed
+            echo "=== Fichiers .htaccess trouvés ==="
+            find ./$last_directory -name ".htaccess"
+            echo "=== Contenu avant sed ==="
+            cat ./$last_directory/atelier1/.htaccess
             # Remplacer les placeholders
             find ./$last_directory -name ".htaccess" -exec sed -i 's/__USERNAME__/${{ secrets.USERNAME }}/g' {} +
             sed -i 's/__USERNAME__/${{ secrets.USERNAME }}/g' ./$last_directory/.htpasswd
             sed -i 's|__HASH__|${{ secrets.HTPASSWD_HASH }}|g' ./$last_directory/.htpasswd
-            # Vérifier si le répertoire de destination existe
+            # Debug : voir le contenu après sed
+            echo "=== Contenu après sed ==="
+            cat ./$last_directory/atelier1/.htaccess
+            cat ./$last_directory/.htpasswd
             if [ "$(ls -A ./www)" ]; then
               rsync -r --delete ./$last_directory/ ./www
               rm -rf ./$last_directory
