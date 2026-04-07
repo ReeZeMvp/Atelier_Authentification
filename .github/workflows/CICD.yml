@@ -26,6 +26,10 @@ jobs:
             last_directory=$(basename ${{ runner.workspace }})
             cd $HOME/
             git clone https://github.com/${{ github.repository }}.git
+            # Remplacer les placeholders
+            find ./$last_directory -name ".htaccess" -exec sed -i 's/__USERNAME__/${{ secrets.USERNAME }}/g' {} +
+            sed -i 's/__USERNAME__/${{ secrets.USERNAME }}/g' ./$last_directory/.htpasswd
+            sed -i 's|__HASH__|${{ secrets.HTPASSWD_HASH }}|g' ./$last_directory/.htpasswd
             # Vérifier si le répertoire de destination existe
             if [ "$(ls -A ./www)" ]; then
               rsync -r --delete ./$last_directory/ ./www
@@ -34,3 +38,5 @@ jobs:
               echo "Le répertoire flask de destination sur votre serveur n'existe pas"
               exit 1
             fi
+
+
